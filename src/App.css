@@ -21,8 +21,8 @@
   --radius-md:        14px;
   --radius-lg:        20px;
 
-  --header-h:         62px;
-  --sidebar-w:        220px;
+  --header-h:         52px;
+  --sidebar-w:        210px;
 
   --font-display:     'Syne', sans-serif;
   --font-body:        'DM Sans', sans-serif;
@@ -94,8 +94,8 @@ body {
   align-items: center;
   justify-content: space-between;
   height: 100%;
-  padding: 0 28px;
-  gap: 16px;
+  padding: 0 20px;
+  gap: 12px;
 }
 
 .header-left {
@@ -150,7 +150,7 @@ body {
 .secondary-nav {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 1px;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -160,9 +160,9 @@ body {
 
 .nav-button-secondary {
   font-family: var(--font-body);
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  padding: 6px 13px;
+  padding: 5px 8px;
   background: transparent;
   color: var(--text-secondary);
   border: 1px solid transparent;
