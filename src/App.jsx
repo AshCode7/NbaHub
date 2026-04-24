@@ -3,7 +3,7 @@ import './App.css';
 
 // Import all feature components
 import FranchiseBuilder from './components/FranchiseBuilder';
-import PrimePredictor from './components/PrimePredictor';
+// import PrimePredictor from './components/PrimePredictor';
 import UnderratedAlgorithm from './components/UnderratedAlgorithm';
 import MatchSimulator from './components/MatchSimulator';
 import QuizShotClock from './components/QuizShotClock';
