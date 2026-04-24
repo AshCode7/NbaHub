@@ -3,7 +3,7 @@ import './App.css';
 
 // Import all feature components
 import FranchiseBuilder from './components/FranchiseBuilder';
-import PrimePredictor from './components/PrimePredictor'; // Corrected: This line must be uncommented
+import PrimePredictor from './components/PrimePredictor'; // This line must be uncommented
 import UnderratedAlgorithm from './components/UnderratedAlgorithm';
 import MatchSimulator from './components/MatchSimulator';
 import QuizShotClock from './components/QuizShotClock';
@@ -17,7 +17,7 @@ import PlayerProfile from './components/PlayerProfile'; // New feature
 const BALLDONTLIE_API_KEY = "ddd08d8f-e111-40a7-a5c1-78970f26148c"; 
 
 function App() {
-  const [activeFeature, setActiveFeature] = useState('PlayerProfile');
+  const [activeFeature, setActiveFeature] = useState('PlayerProfile'); // Set PlayerProfile as default
 
   const renderActiveFeature = () => {
     switch (activeFeature) {
@@ -65,6 +65,8 @@ function App() {
             </div>
             <nav className="secondary-nav">
                 {secondaryNav.map(item => (
+                    // This 'Players' active state is fixed for the visual reference.
+                    // If you add a feature nav, you'd make this dynamic with activeFeature state.
                     <button key={item} className={`nav-button-secondary ${item === 'Players' ? 'active' : ''}`}>{item}</button>
                 ))}
             </nav>
