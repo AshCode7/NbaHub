@@ -1,0 +1,25 @@
+import React from 'react';
+
+// REPLACE THIS SVG WITH YOUR OWN IMAGE
+const PlayerSilhouette = () => (
+  <svg 
+    width="100%" 
+    height="100%" 
+    viewBox="0 0 200 400" 
+    xmlns="http://www.w3.org/2000/svg" 
+    style={{ opacity: 0.1, filter: 'drop-shadow(0 0 15px var(--color-accent-primary))' }}
+  >
+    <defs>
+      <radialGradient id="silhouetteGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+        <stop offset="0%" style={{stopColor: 'var(--color-accent-primary)', stopOpacity: 0.8}} />
+        <stop offset="100%" style={{stopColor: 'var(--color-accent-secondary)', stopOpacity: 0.6}} />
+      </radialGradient>
+    </defs>
+    <path 
+      fill="url(#silhouetteGradient)"
+      d="M110.5,5.5 C108.5,3.5 105.8,2 102.5,2 C99.2,2 96.5,3.5 94.5,5.5 C92.5,7.5 91.5,10.2 91.5,13.5 C91.5,16.8 92.5,19.5 94.5,21.5 C96.5,23.5 99.2,25 102.5,25 C105.8,25 108.5,23.5 110.5,21.5 C112.5,19.5 113.5,16.8 113.5,13.5 C113.5,10.2 112.5,7.5 110.5,5.5 M121,50 L146,45 C146,45 152,69 154,77 L139,112 C139,112 119,103 116,98 C113,93 113,88 113,88 L121,50 M82,50 L57,45 C57,45 51,69 49,77 L64,112 C64,112 84,103 87,98 C90,93 90,88 90,88 L82,50 M116,98 C119,103 120,111 120,111 L112,185 C112,185 112,254 118,299 C124,344 121,373 121,373 L102,398 L82,373 C82,373 79,344 85,299 C91,254 91,185 91,185 L83,111 C83,111 84,103 87,98 M140,296 L151,326 C151,326 157,358 152,376 C147,394 135,396 135,396 L121,373 M63,296 L52,326 C52,326 46,358 51,376 C56,394 68,396 68,396 L82,373"
+    />
+  </svg>
+);
+
+export default PlayerSilhouette;
