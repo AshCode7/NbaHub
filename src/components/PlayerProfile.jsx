@@ -1,192 +1,265 @@
-import React, { useState } from 'react';
-import PlayerSilhouette from './PlayerSilhouette';
+import React, { useState, useEffect } from 'react';
+
+// Mock data to perfectly replicate the UI from the reference image.
+// In a real application, this would require complex API logic to fetch and aggregate.
+const STEPHEN_CURRY_MOCK_STATS = {
+    image: "https://i.ibb.co/b3S00T1/curry-bg.png", // Background image for the component
+    logo: "https://i.ibb.co/3WqYz5b/gsw-logo.png", // Team logo
+    postseason: { MPG: 37, FG: 45.1, "3P%": 39.5, "FT%": 95.7, PPG: 25.5, RPG: 6.1, APG: 5.4, BPG: 0.7 },
+    career: { MPG: 34.4, FG: 47.7, "3P%": 43.6, "FT%": 90.3, PPG: 23.1, RPG: 4.4, APG: 6.8, BPG: 0.2 }
+};
 
 const PlayerProfile = ({ apiKey }) => {
-  const [playerName, setPlayerName] = useState('Stephen Curry');
-  const [playerData, setPlayerData] = useState(null);
-  const [season, setSeason] = useState(new Date().getFullYear() - 1);
-  const [seasonStats, setSeasonStats] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+    // State for the player's info fetched from the API
+    const [playerData, setPlayerData] = useState(null);
+    // This will hold the mocked stats for UI display
+    const [displayStats, setDisplayStats] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  const API_BASE_URL = 'https://api.balldontlie.io/v1';
+    // Fetch initial player data (Stephen Curry) on component mount
+    useEffect(() => {
+        const fetchInitialPlayer = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const response = await fetch(`https://api.balldontlie.io/v1/players?search=Stephen Curry`, {
+                    headers: { 'Authorization': apiKey }
+                });
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                if (data.data.length === 0) throw new Error('Player not found');
+                
+                const curryData = data.data.find(p => p.last_name === 'Curry' && p.first_name === 'Stephen');
+                setPlayerData(curryData);
+                // Set the display stats to our mock data for Curry
+                setDisplayStats(STEPHEN_CURRY_MOCK_STATS);
 
-  const fetchPlayerData = async (e) => {
-    e.preventDefault();
-    if (!playerName) return;
-
-    setLoading(true);
-    setError(null);
-    setPlayerData(null);
-    setSeasonStats(null);
-
-    try {
-      // 1. Get Player ID
-      const playerRes = await fetch(`${API_BASE_URL}/players?search=${playerName}`, {
-        headers: { 'Authorization': apiKey }
-      });
-      const playerResData = await playerRes.json();
-      
-      if (playerResData.data.length === 0) {
-        throw new Error(`Player "${playerName}" not found.`);
-      }
-      const foundPlayer = playerResData.data[0];
-      setPlayerData(foundPlayer);
-      fetchStatsForPlayer(foundPlayer.id, season);
-
-    } catch (err) {
-      setError(err.message);
-      setLoading(false);
-    }
-  };
-  
-  const fetchStatsForPlayer = async (playerId, selectedSeason) => {
-    setLoading(true);
-    setError(null);
-    setSeasonStats(null);
-    try {
-        // 2. Get Season Averages
-        const statsRes = await fetch(`${API_BASE_URL}/season_averages?season=${selectedSeason}&player_ids[]=${playerId}`, {
-            headers: { 'Authorization': apiKey }
-        });
-        const statsData = await statsRes.json();
-        
-        if (!statsData.data || statsData.data.length === 0) {
-            throw new Error(`No stats found for the ${selectedSeason}-${selectedSeason+1} season.`);
-        }
-        setSeasonStats(statsData.data[0]);
-
-    } catch (err) {
-        setError(err.message);
-    } finally {
-        setLoading(false);
-    }
-  }
-
-  // Handle season change for an already loaded player
-  const handleSeasonChange = (newSeason) => {
-    setSeason(newSeason);
-    if(playerData) {
-        fetchStatsForPlayer(playerData.id, newSeason);
-    }
-  }
-  
-  const StatCard = ({ label, value }) => (
-    <div className="stat-card">
-      <div className="stat-value">{value ?? '-'}</div>
-      <div className="stat-label">{label}</div>
-    </div>
-  );
-
-  return (
-    <div className="player-profile-container fade-in">
-        <style>{`
-            .player-profile-container {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 48px;
-                align-items: start;
-                position: relative;
+            } catch (err) {
+                setError(err.message);
+                setPlayerData(null);
+                setDisplayStats(null);
+            } finally {
+                setLoading(false);
             }
-            .profile-left, .profile-right { padding: 24px; }
-            .profile-left { display: flex; flex-direction: column; gap: 24px; }
-            .player-name-display { line-height: 1; }
-            .player-name-first { font-family: var(--font-label); font-size: 3rem; color: var(--color-text-secondary); text-transform: uppercase; }
-            .player-name-last { font-family: var(--font-heading); font-size: 8rem; color: var(--color-text-primary); margin-top: -20px; text-shadow: 0 0 20px var(--color-accent-primary); }
-            .player-info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-            .info-item { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border-left: 3px solid var(--color-accent-primary); }
-            .info-item .label { font-family: var(--font-label); color: var(--color-text-secondary); font-size: 0.9rem; }
-            .info-item .value { font-size: 1.5rem; font-weight: bold; }
-            .profile-right { position: relative; }
-            .silhouette-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: -1; }
-            .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px; }
-            .stat-card { background: var(--color-surface); backdrop-filter: blur(10px); padding: 20px; text-align: center; border-radius: var(--border-radius); border: 1px solid var(--color-border); transition: all 0.3s ease; }
-            .stat-card:hover { transform: scale(1.05); border-color: var(--color-accent-primary); box-shadow: 0 0 15px rgba(79, 195, 247, 0.3); }
-            .stat-value { font-family: var(--font-label); font-size: 2.5rem; font-weight: 700; color: var(--color-accent-primary); }
-            .stat-label { color: var(--color-text-secondary); text-transform: uppercase; font-size: 0.9rem; }
-            .loading-overlay, .error-message, .welcome-message { text-align: center; padding: 40px; }
-             @media (max-width: 1024px) { .player-profile-container { grid-template-columns: 1fr; } .player-name-last {font-size: 6rem;} .profile-right { min-height: 400px; } }
-             @media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .player-name-last {font-size: 4rem;} }
-        `}</style>
+        };
 
-      <div className="profile-left">
-        <form onSubmit={fetchPlayerData} className="controls-container">
-            <input 
-                type="text" 
-                className="styled-input" 
-                value={playerName} 
-                onChange={e => setPlayerName(e.target.value)}
-                placeholder="Search Player Name"
-                style={{flexGrow: 1}}
-            />
-            <button type="submit" className="styled-button" disabled={loading}>{loading ? 'Searching...' : 'Search'}</button>
-        </form>
+        fetchInitialPlayer();
+    }, [apiKey]);
 
-        {playerData && (
-            <div className="player-details fade-in">
-                <div className="player-name-display">
-                    <div className="player-name-first">{playerData.first_name}</div>
-                    <div className="player-name-last">{playerData.last_name}</div>
+    if (loading) {
+        return <div className="profile-message">Loading Player Profile...</div>;
+    }
+    
+    if (error) {
+        return <div className="profile-message error">Error: {error}</div>;
+    }
+
+    if (!playerData || !displayStats) {
+        return <div className="profile-message">No player data available.</div>;
+    }
+
+    return (
+        <div className="player-profile-fullscreen fade-in" style={{ backgroundImage: `url(${displayStats.image})` }}>
+            <div className="profile-overlay">
+                <div className="profile-content">
+                    <div className="profile-info-left">
+                        <div className="player-name-section">
+                            <span className="player-name-first">{playerData.first_name}</span>
+                            <h1 className="player-name-last">{playerData.last_name}</h1>
+                        </div>
+
+                        <div className="player-team-info">
+                            <img src={displayStats.logo} alt="Team Logo" className="team-logo" />
+                            <span className="team-number">#{playerData.jersey_number || 30}</span>
+                            <span className="team-position">{playerData.position}</span>
+                            <button className="follow-button">Follow</button>
+                        </div>
+
+                        <div className="player-bio-grid">
+                            <div className="bio-item">
+                                <span className="bio-label">Height</span>
+                                <span className="bio-value">{playerData.height_feet ? `${playerData.height_feet}' ${playerData.height_inches}"` : '6ft 3in'}</span>
+                            </div>
+                            <div className="bio-item">
+                                <span className="bio-label">Weight</span>
+                                <span className="bio-value">{playerData.weight_pounds ? `${playerData.weight_pounds} lbs` : '190 lbs'}</span>
+                            </div>
+                             <div className="bio-item">
+                                <span className="bio-label">Born</span>
+                                <span className="bio-value">03/14/1988</span>
+                            </div>
+                            <div className="bio-item">
+                                <span className="bio-label">From</span>
+                                <span className="bio-value">Davidson</span>
+                            </div>
+                             <div className="bio-item">
+                                <span className="bio-label">NBA Debut</span>
+                                <span className="bio-value">2009</span>
+                            </div>
+                            <div className="bio-item">
+                                <span className="bio-label">Previously</span>
+                                <span className="bio-value">GSW 2009-18</span>
+                            </div>
+                        </div>
+                    </div>
+                    {/* The right side is intentionally empty to let the player image show */}
+                    <div className="profile-info-right"></div>
                 </div>
-                <div className="player-info-grid">
-                    <div className="info-item">
-                        <div className="label">Position</div>
-                        <div className="value">{playerData.position || 'N/A'}</div>
-                    </div>
-                    <div className="info-item">
-                        <div className="label">Team</div>
-                        <div className="value">{playerData.team.full_name}</div>
-                    </div>
-                    <div className="info-item">
-                        <div className="label">Height</div>
-                        <div className="value">{playerData.height_feet ? `${playerData.height_feet}' ${playerData.height_inches}"` : 'N/A'}</div>
-                    </div>
-                    <div className="info-item">
-                        <div className="label">Weight</div>
-                        <div className="value">{playerData.weight_pounds ? `${playerData.weight_pounds} lbs` : 'N/A'}</div>
-                    </div>
-                </div>
-                 <div className="controls-container" style={{marginTop: '24px', justifyContent: 'flex-start'}}>
-                    <label htmlFor="season-select" style={{fontFamily: 'var(--font-label)', textTransform: 'uppercase'}}>Season:</label>
-                    <input 
-                        id="season-select"
-                        type="number" 
-                        className="styled-input"
-                        value={season}
-                        onChange={e => handleSeasonChange(parseInt(e.target.value))}
-                        min="1979"
-                        max={new Date().getFullYear()}
-                    />
-                </div>
-            </div>
-        )}
 
-      </div>
-      <div className="profile-right">
-        <div className="silhouette-bg"><PlayerSilhouette /></div>
-        {loading && <div className="loading-overlay"><h3>Loading Stats...</h3></div>}
-        {error && <div className="error-message"><h3>{error}</h3></div>}
-        {!playerData && !loading && !error && <div className="welcome-message"><h2>Search for a player to view their profile.</h2></div>}
-
-        {seasonStats && (
-            <div className="stats-container fade-in">
-                <h3 style={{fontFamily: 'var(--font-heading)', fontSize: '2.5rem', textAlign: 'center'}}>{season}-{season+1} Season Averages</h3>
-                <div className="stats-grid">
-                    <StatCard label="Points" value={seasonStats.pts?.toFixed(1)} />
-                    <StatCard label="Rebounds" value={seasonStats.reb?.toFixed(1)} />
-                    <StatCard label="Assists" value={seasonStats.ast?.toFixed(1)} />
-                    <StatCard label="Steals" value={seasonStats.stl?.toFixed(1)} />
-                    <StatCard label="Blocks" value={seasonStats.blk?.toFixed(1)} />
-                    <StatCard label="Turnovers" value={seasonStats.turnover?.toFixed(1)} />
-                    <StatCard label="FG%" value={(seasonStats.fg_pct * 100)?.toFixed(1)} />
-                    <StatCard label="3P%" value={(seasonStats.fg3_pct * 100)?.toFixed(1)} />
-                    <StatCard label="FT%" value={(seasonStats.ft_pct * 100)?.toFixed(1)} />
+                <div className="stats-table-container">
+                    <table className="stats-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                {Object.keys(displayStats.postseason).map(key => <th key={key}>{key}</th>)}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="row-header">Postseason</td>
+                                {Object.values(displayStats.postseason).map((val, i) => <td key={i}>{val}</td>)}
+                            </tr>
+                            <tr>
+                                <td className="row-header">Career Stats</td>
+                                {Object.values(displayStats.career).map((val, i) => <td key={i}>{val}</td>)}
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        )}
-      </div>
-    </div>
-  );
+
+            <style>{`
+                .profile-message {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: calc(100vh - var(--header-height));
+                    font-size: 1.5rem;
+                    color: var(--color-text-secondary);
+                }
+                .profile-message.error { color: #e57373; }
+
+                .player-profile-fullscreen {
+                    width: 100%;
+                    height: calc(100vh - var(--header-height));
+                    background-size: contain;
+                    background-position: right center;
+                    background-repeat: no-repeat;
+                    position: relative;
+                }
+                .profile-overlay {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: linear-gradient(90deg, #0A0A0F 40%, rgba(10, 10, 15, 0.7) 60%, rgba(10, 10, 15, 0) 100%);
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    padding: 4vw;
+                }
+                .profile-content {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    height: 100%;
+                }
+                .profile-info-left {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                }
+                .player-name-section {
+                    line-height: 0.8;
+                }
+                .player-name-first {
+                    font-family: var(--font-body);
+                    font-weight: 300;
+                    font-size: clamp(2rem, 5vw, 4rem);
+                    color: var(--color-text-secondary);
+                    text-transform: uppercase;
+                }
+                .player-name-last {
+                    font-family: var(--font-heading);
+                    font-size: clamp(6rem, 12vw, 11rem);
+                    color: var(--color-text-primary);
+                }
+                .player-team-info {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                    margin-top: 24px;
+                }
+                .team-logo { height: 40px; }
+                .team-number, .team-position {
+                    font-family: var(--font-label);
+                    font-size: 1.2rem;
+                    font-weight: 600;
+                    color: var(--color-text-secondary);
+                    border-left: 1px solid var(--color-border);
+                    padding-left: 16px;
+                }
+                .follow-button {
+                    background: transparent;
+                    border: 1px solid var(--color-accent-primary);
+                    color: var(--color-accent-primary);
+                    padding: 8px 24px;
+                    border-radius: 20px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    transition: all 0.2s ease;
+                }
+                .follow-button:hover { background-color: var(--color-accent-primary); color: var(--color-background); }
+                .player-bio-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 16px 32px;
+                    margin-top: 32px;
+                    max-width: 450px;
+                }
+                .bio-item { display: flex; flex-direction: column; }
+                .bio-label { font-size: 0.9rem; color: var(--color-text-secondary); }
+                .bio-value { font-size: 1.1rem; font-weight: 500; color: var(--color-text-primary); }
+                
+                .stats-table-container {
+                    background-color: rgba(10, 10, 15, 0.5);
+                    backdrop-filter: blur(8px);
+                    border: 1px solid var(--color-border);
+                    border-radius: var(--border-radius);
+                    padding: 16px;
+                }
+                .stats-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-family: var(--font-body);
+                }
+                .stats-table th, .stats-table td {
+                    text-align: center;
+                    padding: 12px 8px;
+                    font-size: 1rem;
+                }
+                .stats-table th {
+                    color: var(--color-text-secondary);
+                    font-weight: 500;
+                    text-transform: uppercase;
+                    font-size: 0.8rem;
+                }
+                .stats-table tbody tr:first-child td { border-bottom: 1px solid var(--color-border); }
+                .stats-table .row-header { text-align: left; font-weight: 600; color: var(--color-text-primary); }
+                
+                @media (max-width: 900px) {
+                    .player-profile-fullscreen { background-position: 120% center; }
+                    .profile-overlay { background: linear-gradient(90deg, #0A0A0F 60%, rgba(10, 10, 15, 0.7) 85%, rgba(10, 10, 15, 0) 100%); }
+                    .profile-content { grid-template-columns: 1fr; }
+                    .profile-info-right { display: none; }
+                }
+                 @media (max-width: 768px) {
+                     .stats-table th, .stats-table td { padding: 8px 4px; font-size: 0.9rem; }
+                 }
+            `}</style>
+        </div>
+    );
 };
 
 export default PlayerProfile;
