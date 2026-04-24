@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import './App.css';
 
-// Import all feature components
+// Import all feature components - Ensure these are correct paths
 import FranchiseBuilder from './components/FranchiseBuilder';
-import PrimePredictor from './components/PrimePredictor'; // This line must be uncommented
+import PrimePredictor from './components/PrimePredictor';
 import UnderratedAlgorithm from './components/UnderratedAlgorithm';
 import MatchSimulator from './components/MatchSimulator';
 import QuizShotClock from './components/QuizShotClock';
@@ -44,14 +44,21 @@ function App() {
     }
   };
 
+  // The main navigation items are not currently visible in the UI based on your reference image,
+  // but they are kept here for logical consistency if you ever re-introduce a main nav.
   const features = [
     { id: 'PlayerProfile', name: 'Player Profile' },
     { id: 'PrimePredictor', name: 'Prime Predictor' },
     { id: 'DraftHistorian', name: 'Draft Historian' },
     { id: 'GoatMeter', name: 'GOAT Meter' },
-    // You can add other features here if you want them in a main navigation (currently hidden by the reference image design)
+    { id: 'FranchiseBuilder', name: 'Franchise Builder' },
+    { id: 'UnderratedAlgorithm', name: 'Underrated Algorithm' },
+    { id: 'JerseyNumberHistory', name: 'Jersey Number History' },
+    { id: 'MatchSimulator', name: 'Match Simulator' },
+    { id: 'QuizShotClock', name: 'Quiz Shot-Clock' },
   ];
   
+  // This secondary navigation is rendered in the header to match the reference image.
   const secondaryNav = ['Scores', 'News', 'Video', 'Players', 'Teams', 'Playoffs', 'Draft'];
 
 
@@ -75,11 +82,11 @@ function App() {
             </div>
         </div>
       </header>
-       {/* Main feature navigation is now removed to match the reference image's focused UI */}
+       {/* Main content area where features are rendered */}
       <main className="feature-container">
         {renderActiveFeature()}
       </main>
-      {/* The footer is removed to achieve the full-screen app feel */}
+      {/* The footer is removed to achieve the full-screen app feel based on reference image */}
     </div>
   );
 }
