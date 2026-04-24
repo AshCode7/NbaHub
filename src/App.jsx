@@ -3,7 +3,7 @@ import './App.css';
 
 // Import all feature components
 import FranchiseBuilder from './components/FranchiseBuilder';
-// import PrimePredictor from './components/PrimePredictor';
+import PrimePredictor from './components/PrimePredictor'; // UNCOMMENTED THIS LINE
 import UnderratedAlgorithm from './components/UnderratedAlgorithm';
 import MatchSimulator from './components/MatchSimulator';
 import QuizShotClock from './components/QuizShotClock';
@@ -49,9 +49,9 @@ function App() {
     { id: 'PrimePredictor', name: 'Prime Predictor' },
     { id: 'DraftHistorian', name: 'Draft Historian' },
     { id: 'GoatMeter', name: 'GOAT Meter' },
+    // Add other features here if you want them in the main nav
   ];
   
-  // A secondary navigation bar as seen in the reference image
   const secondaryNav = ['Scores', 'News', 'Video', 'Players', 'Teams', 'Playoffs', 'Draft'];
 
 
@@ -73,11 +73,9 @@ function App() {
             </div>
         </div>
       </header>
-       {/* Main feature navigation is now removed to match the reference image's focused UI */}
       <main className="feature-container">
         {renderActiveFeature()}
       </main>
-      {/* The footer is removed to achieve the full-screen app feel */}
     </div>
   );
 }
