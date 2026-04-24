@@ -30,7 +30,7 @@ const PlayerProfile = ({ apiKey }) => {
             const playerRes = await fetch(`${API_BASE_URL}/players?search=${name}`, {
                 headers: { 'Authorization': apiKey }
             });
-            if (!playerRes.ok) throw new Error('Network response was not ok');
+            if (!playerRes.ok) throw new Error(`API request failed with status: ${playerRes.status}`);
             const playerDataResponse = await playerRes.json();
             
             if (!playerDataResponse.data || playerDataResponse.data.length === 0) {

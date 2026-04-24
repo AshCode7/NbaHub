@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+// Hardcoded player data: name, position, and salary for different years
 const historicalPlayers = [
   { id: 1, name: 'Michael Jordan', pos: 'SG', salaries: { 1996: 30140000, 1998: 33140000 } },
   { id: 2, name: 'Shaquille O\'Neal', pos: 'C', salaries: { 1996: 10714000, 2003: 23571429, 2009: 20000000 } },
@@ -15,36 +16,73 @@ const historicalPlayers = [
   { id: 12, name: 'Carmelo Anthony', pos: 'SF', salaries: { 2003: 3229200, 2009: 15779912 } },
 ];
 
-const salaryCaps = { 1996: 24363000, 1998: 30000000, 2003: 43840000, 2009: 57700000, 2012: 58044000 };
+// Hardcoded salary caps for specific NBA seasons
+const salaryCaps = {
+  1996: 24363000,
+  1998: 30000000,
+  2003: 43840000,
+  2009: 57700000,
+  2012: 58044000,
+};
 
 const FranchiseBuilder = () => {
   const [selectedYear, setSelectedYear] = useState(2003);
-  const [team, setTeam] = useState([]);
+  const [team, setTeam] = useState([]); // Array of player objects
   const [playerPool, setPlayerPool] = useState(historicalPlayers);
   const [draggedPlayer, setDraggedPlayer] = useState(null);
 
+  // Calculate the current team's total salary
   const currentSalary = team.reduce((total, player) => total + (player.salaries[selectedYear] || 0), 0);
   const hardCap = salaryCaps[selectedYear];
   const capSpace = hardCap - currentSalary;
 
+  // Filter player pool to show only players with a salary for the selected year
   const availablePlayers = playerPool.filter(p => p.salaries[selectedYear] !== undefined);
 
   const handleYearChange = (e) => {
     const year = parseInt(e.target.value);
     setSelectedYear(year);
+    // When year changes, reset the team and pool if they have invalid players
     setTeam([]);
     setPlayerPool(historicalPlayers);
   };
 
-  const handleDragStart = (e, player) => { setDraggedPlayer(player); };
-  const handleDragOver = (e) => { e.preventDefault(); };
+  // Drag and Drop Handlers
+  const handleDragStart = (e, player) => {
+    setDraggedPlayer(player);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault(); // Necessary to allow dropping
+  };
 
   const handleDropOnTeam = (e) => {
     e.preventDefault();
     if (!draggedPlayer) return;
-    if (team.find(p => p.id === draggedPlayer.id) || team.length >= 5 || currentSalary + (draggedPlayer.salaries[selectedYear] || 0) > hardCap) {
-      setDraggedPlayer(null); return;
+
+    // Check if player is already on the team
+    if (team.find(p => p.id === draggedPlayer.id)) {
+      alert("Player is already on your team.");
+      setDraggedPlayer(null);
+      return;
     }
+
+    // Check team size
+    if (team.length >= 5) {
+      alert("Your starting 5 is already full.");
+      setDraggedPlayer(null);
+      return;
+    }
+    
+    // Check salary cap
+    if (currentSalary + (draggedPlayer.salaries[selectedYear] || 0) > hardCap) {
+        alert("Adding this player exceeds the hard cap!");
+        setDraggedPlayer(null);
+        return;
+    }
+
+    // Add player to team and remove from pool
     setTeam([...team, draggedPlayer]);
     setPlayerPool(playerPool.filter(p => p.id !== draggedPlayer.id));
     setDraggedPlayer(null);
@@ -53,17 +91,23 @@ const FranchiseBuilder = () => {
   const handleDropOnPool = (e) => {
     e.preventDefault();
     if (!draggedPlayer || !team.find(p => p.id === draggedPlayer.id)) {
-      setDraggedPlayer(null); return;
+      // Only allow dropping players that were originally on the team
+      setDraggedPlayer(null);
+      return;
     }
+
+    // Remove player from team and add back to pool
     setTeam(team.filter(p => p.id !== draggedPlayer.id));
     setPlayerPool([...playerPool, draggedPlayer]);
     setDraggedPlayer(null);
   };
 
-  const formatCurrency = (amount) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(amount);
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(amount);
+  };
 
   return (
-    <div className="fade-in">
+    <div className="fade-in" style={{ padding: '2rem' }}>
       <style>{`
         .franchise-builder-container { display: flex; justify-content: space-around; gap: 24px; flex-wrap: wrap; }
         .player-pool-container, .my-team-container { background-color: var(--color-surface); border: 1px dashed var(--color-border); border-radius: var(--border-radius); padding: 16px; width: 45%; min-height: 400px; display: flex; flex-direction: column; }

@@ -65,6 +65,7 @@ const PrimePredictor = ({ apiKey }) => {
   const p1Stats = player1.stats;
   const p2Stats = player2.stats;
 
+  // Ensure radarData and barData are only built if both players have stats
   const radarData = p1Stats && p2Stats ? [
     { stat: 'PTS', P1: p1Stats.pts || 0, P2: p2Stats.pts || 0 },
     { stat: 'REB', P1: p1Stats.reb || 0, P2: p2Stats.reb || 0 },
