@@ -30,7 +30,7 @@ const PlayerProfile = ({ apiKey }) => {
             const playerRes = await fetch(`${API_BASE_URL}/players?search=${name}`, {
                 headers: { 'Authorization': apiKey }
             });
-            if (!playerRes.ok) throw new Error('Failed to fetch player data.');
+            if (!playerRes.ok) throw new Error('Network response was not ok');
             const playerDataResponse = await playerRes.json();
             
             if (!playerDataResponse.data || playerDataResponse.data.length === 0) {
@@ -55,8 +55,9 @@ const PlayerProfile = ({ apiKey }) => {
 
     // Fetch Stephen Curry's data on initial component mount
     useEffect(() => {
-        fetchPlayerInfo(playerNameInput);
-    }, [apiKey]); // Removed playerNameInput from dependencies to only run once. Will fetch on button click.
+        // Only fetch on initial mount, subsequent searches are handled by button click
+        fetchPlayerInfo(playerNameInput); 
+    }, [apiKey]); 
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
