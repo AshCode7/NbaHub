@@ -69,6 +69,12 @@ body {
 .feature-bg-primepredictor { background-image: radial-gradient(circle at top left, rgba(79, 195, 247, 0.2), var(--color-background) 70%); }
 .feature-bg-drafthistorian { background-image: radial-gradient(circle at bottom right, rgba(21, 101, 192, 0.25), var(--color-background) 70%); }
 .feature-bg-goatmeter { background-image: radial-gradient(circle at bottom left, rgba(79, 195, 247, 0.2), var(--color-background) 70%); }
+.feature-bg-franchisebuilder { background-image: radial-gradient(ellipse at center, rgba(21, 101, 192, 0.4), var(--color-background) 70%); } /* Added for consistency */
+.feature-bg-underratedalgorithm { background-image: radial-gradient(ellipse at top, rgba(79, 195, 247, 0.3), var(--color-background) 70%); } /* Added for consistency */
+.feature-bg-jerseynumberhistory { background-image: radial-gradient(circle at top right, rgba(21, 101, 192, 0.5), var(--color-background) 60%); } /* Added for consistency */
+.feature-bg-matchsimulator { background-image: radial-gradient(circle at bottom, rgba(79, 195, 247, 0.4), var(--color-background) 60%); } /* Added for consistency */
+.feature-bg-quizshotclock { background-image: radial-gradient(circle at center, rgba(21, 101, 192, 0.55), var(--color-background) 70%); } /* Added for consistency */
+
 
 .app-header {
   height: var(--header-height);
