@@ -68,6 +68,7 @@ const PlayerProfile = ({ apiKey }) => {
         const data = await response.json();
         if (data.data?.length > 0) {
           setPlayerStats(data.data[0]);
+          setLoading(false); // Set loading to false here
           return; // Exit after finding stats
         }
       }
@@ -76,7 +77,7 @@ const PlayerProfile = ({ apiKey }) => {
     } catch (e) {
       setError('Could not fetch player stats.');
     } finally {
-      setLoading(false);
+      setLoading(false); // Ensure loading is always set to false
     }
   }, [apiKey]);
   
@@ -119,7 +120,7 @@ const PlayerProfile = ({ apiKey }) => {
             <p><strong>Height:</strong> {selectedPlayer.height || 'N/A'}</p>
             <p><strong>Weight:</strong> {selectedPlayer.weight ? `${selectedPlayer.weight} lbs` : 'N/A'}</p>
             <p><strong>Country:</strong> {selectedPlayer.country || 'N/A'}</p>
-            <p><strong>Draft:</strong> {selectedPlayer.draft_year || 'N/A'} R{selectedPlayer.draft_round} P{selectedPlayer.draft_number}</p>
+            <p><strong>Draft:</strong> {selectedPlayer.draft_year || 'N/A'} {selectedPlayer.draft_round && `R${selectedPlayer.draft_round}`} {selectedPlayer.draft_number && `P${selectedPlayer.draft_number}`}</p>
           </div>
           <div className="divider" />
           <div className="section-label">
@@ -163,7 +164,7 @@ const PlayerProfile = ({ apiKey }) => {
         .loading-state span { font-size: 2rem; display: block; margin-bottom: 10px; }
         .error-message { text-align: center; color: #f87171; background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.2); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 24px; }
         .search-results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
-        .player-card { cursor: pointer; transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease); display: flex; align-items: center; gap: 16px; position: relative; overflow: hidden; }
+        .player-card { cursor: pointer; transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), border-color 0.2s var(--ease); display: flex; align-items: center; gap: 16px; position: relative; overflow: hidden; }
         .player-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(0,0,0,0.5); border-color: var(--border-active); }
         .silhouette-container { width: 60px; height: 60px; flex-shrink: 0; position: relative; }
         .player-card-info { position: relative; z-index: 1; }
