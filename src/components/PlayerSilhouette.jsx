@@ -1,18 +1,25 @@
 import React from 'react';
 
-// REPLACE THIS SVG WITH YOUR OWN IMAGE
+// A simple SVG silhouette of a basketball player.
 const PlayerSilhouette = () => (
   <svg 
     width="100%" 
     height="100%" 
     viewBox="0 0 200 400" 
     xmlns="http://www.w3.org/2000/svg" 
-    style={{ opacity: 0.1, filter: 'drop-shadow(0 0 15px var(--color-accent-primary))' }}
+    style={{
+      opacity: 0.2, 
+      filter: 'drop-shadow(0 0 10px var(--accent))',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      zIndex: 0,
+    }}
   >
     <defs>
       <radialGradient id="silhouetteGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-        <stop offset="0%" style={{stopColor: 'var(--color-accent-primary)', stopOpacity: 0.8}} />
-        <stop offset="100%" style={{stopColor: 'var(--color-accent-secondary)', stopOpacity: 0.6}} />
+        <stop offset="0%" style={{stopColor: 'var(--accent)', stopOpacity: 0.8}} />
+        <stop offset="100%" style={{stopColor: 'var(--accent-border)', stopOpacity: 0.6}} />
       </radialGradient>
     </defs>
     <path 
