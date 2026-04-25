@@ -72,8 +72,12 @@ const PrimePredictor = ({ apiKey }) => {
 
     try {
       // Step 1: find the player
+      // balldontlie searches by last name — extract it, then match full name from results
+      const nameParts = playerName.trim().split(' ');
+      const lastName  = nameParts.length > 1 ? nameParts[nameParts.length - 1] : nameParts[0];
+
       const playerRes = await fetch(
-        `${API_BASE_URL}/players?search=${encodeURIComponent(playerName)}`,
+        `${API_BASE_URL}/players?search=${encodeURIComponent(lastName)}&per_page=25`,
         { headers: { Authorization: apiKey } }
       );
 
@@ -84,10 +88,20 @@ const PrimePredictor = ({ apiKey }) => {
       const playerData = await playerRes.json();
 
       if (!playerData.data || playerData.data.length === 0) {
-        throw new Error(`Player "${playerName}" not found. Check the spelling.`);
+        throw new Error(`Player "${playerName}" not found. Try last name only (e.g. "James").`);
       }
 
-      const player = playerData.data[0];
+      // Match: exact full name > first+last > last name > first result
+      const q = playerName.toLowerCase();
+      const player =
+        playerData.data.find(p => `${p.first_name} ${p.last_name}`.toLowerCase() === q) ||
+        playerData.data.find(p =>
+          nameParts.length > 1 &&
+          p.first_name.toLowerCase() === nameParts[0].toLowerCase() &&
+          p.last_name.toLowerCase() === lastName.toLowerCase()
+        ) ||
+        playerData.data.find(p => p.last_name.toLowerCase() === lastName.toLowerCase()) ||
+        playerData.data[0];
 
       // Step 2: fetch season averages
       const statsRes = await fetch(

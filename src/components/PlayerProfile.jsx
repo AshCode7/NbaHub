@@ -111,8 +111,8 @@ const PlayerProfile = ({ apiKey }) => {
 
   const [c1, c2] = teamColors(player?.team?.full_name);
 
-  /* ── Skeleton / error states ────────────────────────────────────── */
-  const SearchBar = () => (
+  /* ── Search bar JSX (not a sub-component to avoid re-mount issues) ── */
+  const searchBarJSX = (
     <form onSubmit={handleSearch} style={{ display: 'flex', gap: 10, width: '100%', maxWidth: 480 }}>
       <input
         value={inputVal}
@@ -125,8 +125,8 @@ const PlayerProfile = ({ apiKey }) => {
         }}
       />
       <button type="submit" disabled={loading} style={{
-        background: 'linear-gradient(135deg, #fff 0%, #ccc 100%)',
-        color: '#000', border: 'none', borderRadius: 10, padding: '10px 20px',
+        background: 'linear-gradient(135deg, #c8f135 0%, #a8d020 100%)',
+        color: '#07070d', border: 'none', borderRadius: 10, padding: '10px 20px',
         fontWeight: 700, fontFamily: "'DM Sans', sans-serif", cursor: 'pointer',
         fontSize: '0.9rem', opacity: loading ? 0.5 : 1,
       }}>
@@ -348,7 +348,7 @@ const PlayerProfile = ({ apiKey }) => {
 
         {/* Top bar */}
         <div className="pp-topbar">
-          <SearchBar />
+          {searchBarJSX}
           {error && <div className="pp-error">⚠ {error}</div>}
         </div>
 
