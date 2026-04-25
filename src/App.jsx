@@ -49,7 +49,7 @@ function App() {
   const active = FEATURES.find(f => f.id === activeFeature);
 
   return (
-    <div className={`App feature-bg-${activeFeature.toLowerCase()}`}>
+    <div className={`App`}>
 
       {/* ── HEADER ── */}
       <header className="app-header">
