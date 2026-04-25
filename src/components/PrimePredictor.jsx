@@ -190,7 +190,7 @@ const PrimePredictor = ({ apiKey }) => {
                 { name: 'Rebounds', [player1.name]: safeNum(p1.reb), [player2.name]: safeNum(p2.reb) },
                 { name: 'Assists',  [player1.name]: safeNum(p1.ast), [player2.name]: safeNum(p2.ast) },
                 { name: 'FG%',      [player1.name]: safePct(p1.fg_pct), [player2.name]: safePct(p2.fg_pct) },
-                { name: '3P%',      [player1.name]: safePct(p1.fg3_pct), [player2.name]: safePct(p2.fg3_pct) },
+                { name: '3P%',      [player1.name]: safePct(p1.fg3_pct), [player2.name]: safePct(p2.fg_pct) },
               ]} margin={{ left: 10, right: 20 }}>
                 <XAxis type="number" stroke="rgba(255,255,255,0.2)" tick={{ fontSize: 11, fill: 'rgba(240,240,248,0.45)' }} />
                 <YAxis type="category" dataKey="name" stroke="rgba(255,255,255,0.2)" width={72} tick={{ fontSize: 11, fill: 'rgba(240,240,248,0.45)' }} />
