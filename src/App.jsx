@@ -20,16 +20,13 @@ const FEATURES = [
   { id: 'GoatMeter',            name: 'GOAT Meter',            icon: '🐐' },
   { id: 'FranchiseBuilder',     name: 'Franchise Builder',     icon: '🏗️' },
   { id: 'UnderratedAlgorithm',  name: 'Underrated Algorithm',  icon: '💎' },
-  { id: 'JerseyNumberHistory',  name: 'Jersey Number History', icon: '#️⃣' },
-  { id: 'MatchSimulator',       name: 'Match Simulator',       icon: '🏀' },
-  { id: 'QuizShotClock',        name: 'Quiz Shot-Clock',       icon: '⏱️' },
+  { id: 'JerseyNumberHistory',  name: 'Jersey #',              icon: '#️⃣' },
+  { id: 'MatchSimulator',       name: 'Match Sim',             icon: '🏀' },
+  { id: 'QuizShotClock',        name: 'Quiz',                  icon: '⏱️' },
 ];
 
 function App() {
   const [activeFeature, setActiveFeature] = useState('PlayerProfile');
-  const [menuOpen, setMenuOpen]           = useState(false);
-
-  const navigate = (id) => { setActiveFeature(id); setMenuOpen(false); };
 
   const renderFeature = () => {
     switch (activeFeature) {
@@ -49,47 +46,40 @@ function App() {
   const active = FEATURES.find(f => f.id === activeFeature);
 
   return (
-    <div className={`App`}>
+    <div className={`App feature-bg-${activeFeature.toLowerCase()}`}>
 
-      {/* ── HEADER ── */}
+      {/* ── HEADER — nav only, NO hamburger, NO sidebar ── */}
       <header className="app-header">
         <div className="header-top-row">
 
+          {/* Left: logo + active label */}
           <div className="header-left">
-            <button
-              className="hamburger-menu"
-              onClick={() => setMenuOpen(v => !v)}
-              aria-label="Toggle navigation"
-            >
-              {menuOpen ? '✕' : '☰'}
-            </button>
-
             <img
               src="https://i.ibb.co/6gZSkGr/nba-logo-transparent.png"
               alt="NBA Hub"
               className="nba-logo"
             />
-
             <span className="header-feature-label">
               {active?.icon}&nbsp;{active?.name}
             </span>
           </div>
 
-          {/* Desktop nav */}
+          {/* Centre: full nav */}
           <nav className="secondary-nav desktop-only">
             {FEATURES.map(f => (
               <button
                 key={f.id}
                 className={`nav-button-secondary ${activeFeature === f.id ? 'active' : ''}`}
-                onClick={() => navigate(f.id)}
+                onClick={() => setActiveFeature(f.id)}
               >
                 {f.name}
               </button>
             ))}
           </nav>
 
-          <div className="search-icon" aria-label="Search">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+          {/* Right: search icon */}
+          <div className="search-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8"/>
               <line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -98,25 +88,6 @@ function App() {
 
         </div>
       </header>
-
-      {/* ── MOBILE SIDEBAR ── */}
-      {menuOpen && (
-        <div className="mobile-sidebar-overlay" onClick={() => setMenuOpen(false)}>
-          <nav className="mobile-sidebar" onClick={e => e.stopPropagation()}>
-            <p className="sidebar-heading">Navigate</p>
-            {FEATURES.map(f => (
-              <button
-                key={f.id}
-                className={`sidebar-item ${activeFeature === f.id ? 'active' : ''}`}
-                onClick={() => navigate(f.id)}
-              >
-                <span className="sidebar-icon">{f.icon}</span>
-                {f.name}
-              </button>
-            ))}
-          </nav>
-        </div>
-      )}
 
       {/* ── CONTENT ── */}
       <main className="feature-container">
