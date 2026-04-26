@@ -5,6 +5,7 @@ import {
 } from 'recharts';
 
 const API_BASE = 'https://api.balldontlie.io/v1';
+const API_KEY  = 'ddd08d8f-e111-40a7-a5c1-78970f26148c';
 const P1_COLOR = '#c8f135';
 const P2_COLOR = '#4fc3f7';
 
@@ -13,8 +14,8 @@ const safeNum = (v)  => (v != null ? Number(v) : 0);
 const fmt     = (v)  => (v != null ? Number(v).toFixed(1) : '—');
 
 /* ── safe fetch that handles non-JSON gracefully ───────────────────── */
-const apiFetch = async (url, apiKey) => {
-  const res  = await fetch(url, { headers: { Authorization: apiKey } });
+const apiFetch = async (url) => {
+  const res  = await fetch(url, { headers: { 'Authorization': API_KEY } });
   const text = await res.text();
   let data;
   try { data = JSON.parse(text); }
@@ -24,10 +25,10 @@ const apiFetch = async (url, apiKey) => {
 };
 
 /* ── find player by name ───────────────────────────────────────────── */
-const findPlayer = async (name, apiKey) => {
+const findPlayer = async (name) => {
   const parts    = name.trim().split(' ');
   const lastName = parts.length > 1 ? parts[parts.length - 1] : parts[0];
-  const data     = await apiFetch(`${API_BASE}/players?search=${encodeURIComponent(lastName)}&per_page=25`, apiKey);
+  const data     = await apiFetch(`${API_BASE}/players?search=${encodeURIComponent(lastName)}&per_page=25`);
   if (!data.data?.length) throw new Error(`Player "${name}" not found. Try last name only.`);
   const q = name.toLowerCase();
   return (
@@ -38,7 +39,7 @@ const findPlayer = async (name, apiKey) => {
 };
 
 /* ── fetch season averages — try both endpoint styles ──────────────── */
-const fetchSeasonAvg = async (playerId, season, apiKey) => {
+const fetchSeasonAvg = async (playerId, season) => {
   // v1 endpoint (current)
   try {
     const data = await apiFetch(
@@ -101,8 +102,8 @@ const PrimePredictor = ({ apiKey }) => {
   const fetchStats = async (playerName, season, setter) => {
     setter(prev => ({ ...prev, loading: true, error: null, stats: null }));
     try {
-      const player = await findPlayer(playerName, apiKey);
-      const stats  = await fetchSeasonAvg(player.id, season, apiKey);
+      const player = await findPlayer(playerName);
+      const stats  = await fetchSeasonAvg(player.id, season);
       if (!stats) throw new Error(`No stats for ${player.first_name} ${player.last_name} in ${season}–${season+1}. Try a different season (2000–2023 work best).`);
       setter(prev => ({ ...prev, stats, loading: false }));
     } catch (e) {

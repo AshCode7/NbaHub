@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 
 const API_BASE = 'https://api.balldontlie.io/v1';
+const API_KEY  = 'ddd08d8f-e111-40a7-a5c1-78970f26148c';
 const fmt = (v, d = 1) => v != null ? Number(v).toFixed(d) : '—';
 const pct = (v)        => v != null ? (v * 100).toFixed(1) : '—';
 
@@ -197,7 +198,7 @@ const PlayerProfile = ({ apiKey }) => {
     setLoading(true); setError(null); setResults([]); setPlayer(null); setStats(null);
     try {
       const res  = await fetch(`${API_BASE}/players?search=${encodeURIComponent(query.trim())}&per_page=12`, {
-        headers: { Authorization: `${apiKey}` },
+        headers: { 'Authorization': API_KEY },
       });
       const text = await res.text();
       let data;
@@ -216,7 +217,7 @@ const PlayerProfile = ({ apiKey }) => {
       const yr = new Date().getFullYear();
       for (const season of [yr - 1, yr - 2, yr - 3]) {
         const res  = await fetch(`${API_BASE}/season_averages?season=${season}&player_ids[]=${p.id}`, {
-          headers: { Authorization: `${apiKey}` },
+          headers: { 'Authorization': API_KEY },
         });
         const text = await res.text();
         let data;
