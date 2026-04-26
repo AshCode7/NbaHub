@@ -67,9 +67,11 @@ const PrimePredictor = ({ apiKey }) => {
       const parts    = playerName.trim().split(' ');
       const lastName = parts.length > 1 ? parts[parts.length - 1] : parts[0];
 
-      const pRes  = await fetch(`${API_BASE_URL}/players?search=${encodeURIComponent(lastName)}&per_page=25`, { headers: { Authorization: apiKey } });
-      if (!pRes.ok) throw new Error(`API error ${pRes.status}`);
-      const pData = await pRes.json();
+      const pRes  = await fetch(`${API_BASE_URL}/players?search=${encodeURIComponent(lastName)}&per_page=25`, { headers: { Authorization: `${apiKey}` } });
+      const pText = await pRes.text();
+      let pData;
+      try { pData = JSON.parse(pText); } catch { throw new Error('API key invalid or not authorized.'); }
+      if (!pRes.ok) throw new Error(pData?.error || `API error ${pRes.status}`);
       if (!pData.data?.length) throw new Error(`"${playerName}" not found. Try last name only.`);
 
       const q = playerName.toLowerCase();
@@ -79,8 +81,10 @@ const PrimePredictor = ({ apiKey }) => {
         pData.data.find(p => p.last_name.toLowerCase() === lastName.toLowerCase()) ||
         pData.data[0];
 
-      const sRes  = await fetch(`${API_BASE_URL}/season_averages?season=${season}&player_ids[]=${found.id}`, { headers: { Authorization: apiKey } });
-      const sData = await sRes.json();
+      const sRes  = await fetch(`${API_BASE_URL}/season_averages?season=${season}&player_ids[]=${found.id}`, { headers: { Authorization: `${apiKey}` } });
+      const sText = await sRes.text();
+      let sData;
+      try { sData = JSON.parse(sText); } catch { throw new Error('Stats API returned invalid response.'); }
 
       if (!sData.data?.length) throw new Error(`No stats for ${found.first_name} ${found.last_name} in ${season}–${season + 1}. Try a different season.`);
       setter(prev => ({ ...prev, stats: sData.data[0], loading: false }));
@@ -190,7 +194,7 @@ const PrimePredictor = ({ apiKey }) => {
                 { name: 'Rebounds', [player1.name]: safeNum(p1.reb), [player2.name]: safeNum(p2.reb) },
                 { name: 'Assists',  [player1.name]: safeNum(p1.ast), [player2.name]: safeNum(p2.ast) },
                 { name: 'FG%',      [player1.name]: safePct(p1.fg_pct), [player2.name]: safePct(p2.fg_pct) },
-                { name: '3P%',      [player1.name]: safePct(p1.fg3_pct), [player2.name]: safePct(p2.fg_pct) },
+                { name: '3P%',      [player1.name]: safePct(p1.fg3_pct), [player2.name]: safePct(p2.fg3_pct) },
               ]} margin={{ left: 10, right: 20 }}>
                 <XAxis type="number" stroke="rgba(255,255,255,0.2)" tick={{ fontSize: 11, fill: 'rgba(240,240,248,0.45)' }} />
                 <YAxis type="category" dataKey="name" stroke="rgba(255,255,255,0.2)" width={72} tick={{ fontSize: 11, fill: 'rgba(240,240,248,0.45)' }} />
