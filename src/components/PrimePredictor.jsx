@@ -13,7 +13,7 @@ const safePct = (v) => (v != null ? (v * 100).toFixed(1) : '—');
 const safeNum = (v)  => (v != null ? Number(v) : 0);
 const fmt     = (v)  => (v != null ? Number(v).toFixed(1) : '—');
 
-/* ── safe fetch that handles non-JSON gracefully ───────────────────── */
+/* ── safe fetch ─────────────────────────────────────────────────── */
 const apiFetch = async (url) => {
   const res  = await fetch(url, { headers: { 'Authorization': API_KEY } });
   const text = await res.text();
@@ -24,7 +24,7 @@ const apiFetch = async (url) => {
   return data;
 };
 
-/* ── find player by name ───────────────────────────────────────────── */
+/* ── find player by name ─────────────────────────────────────────── */
 const findPlayer = async (name) => {
   const parts    = name.trim().split(' ');
   const lastName = parts.length > 1 ? parts[parts.length - 1] : parts[0];
@@ -38,22 +38,20 @@ const findPlayer = async (name) => {
   );
 };
 
-/* ── fetch season averages — try both endpoint styles ──────────────── */
+/* ── fetch season averages ───────────────────────────────────────── */
 const fetchSeasonAvg = async (playerId, season) => {
-  // v1 endpoint (current)
+  // Try with array bracket syntax first
   try {
     const data = await apiFetch(
-      `${API_BASE}/season_averages?season=${season}&player_ids[]=${playerId}`,
-      apiKey
+      `${API_BASE}/season_averages?season=${season}&player_ids[]=${playerId}`
     );
     if (data.data?.length) return data.data[0];
   } catch (_) {}
 
-  // some accounts use player_id (no brackets)
+  // Fallback: no-bracket syntax
   try {
     const data = await apiFetch(
-      `${API_BASE}/season_averages?season=${season}&player_id=${playerId}`,
-      apiKey
+      `${API_BASE}/season_averages?season=${season}&player_id=${playerId}`
     );
     if (data.data?.length) return data.data[0];
   } catch (_) {}
@@ -61,7 +59,7 @@ const fetchSeasonAvg = async (playerId, season) => {
   return null;
 };
 
-/* ── Stat compare row ──────────────────────────────────────────────── */
+/* ── Stat compare row ────────────────────────────────────────────── */
 const CompareRow = ({ label, v1, v2 }) => {
   const n1 = parseFloat(v1) || 0;
   const n2 = parseFloat(v2) || 0;
@@ -79,12 +77,12 @@ const CompareRow = ({ label, v1, v2 }) => {
   );
 };
 
-/* ── Player input ──────────────────────────────────────────────────── */
+/* ── Player input ────────────────────────────────────────────────── */
 const PlayerInput = ({ label, color, name, season, onName, onSeason, loading, error }) => (
   <div style={{ flex: 1, minWidth: 200 }}>
     <div style={{ fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', color, marginBottom: 8 }}>{label}</div>
-    <input type="text"    className="styled-input" value={name}   placeholder="Player name…" onChange={e => onName(e.target.value)}   style={{ width: '100%', marginBottom: 8 }} />
-    <input type="number"  className="styled-input" value={season} min="1979" max={new Date().getFullYear()} onChange={e => onSeason(parseInt(e.target.value) || season)} style={{ width: '100%' }} />
+    <input type="text"   className="styled-input" value={name}   placeholder="Player name…" onChange={e => onName(e.target.value)}   style={{ width: '100%', marginBottom: 8 }} />
+    <input type="number" className="styled-input" value={season} min="1979" max={new Date().getFullYear()} onChange={e => onSeason(parseInt(e.target.value) || season)} style={{ width: '100%' }} />
     {loading && <div style={{ fontSize: '0.8rem', color: 'rgba(244,244,251,0.38)', marginTop: 6 }}>Searching…</div>}
     {error   && <div style={{ fontSize: '0.8rem', color: '#f87171', marginTop: 6 }}>{error}</div>}
   </div>
@@ -94,7 +92,7 @@ const tooltipStyle = {
   contentStyle: { background: 'rgba(10,10,20,0.96)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, color: '#f4f4fb', fontSize: '0.85rem' },
 };
 
-/* ══════════════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════════════ */
 const PrimePredictor = ({ apiKey }) => {
   const [p1, setP1] = useState({ name: 'LeBron James', season: 2012, stats: null, loading: false, error: null });
   const [p2, setP2] = useState({ name: 'Kobe Bryant',  season: 2006, stats: null, loading: false, error: null });
@@ -133,7 +131,10 @@ const PrimePredictor = ({ apiKey }) => {
   return (
     <div className="fade-in" style={{ padding: '44px 40px', maxWidth: 1100, margin: '0 auto' }}>
       <h2 className="feature-title">Prime Predictor</h2>
-      <p className="feature-description">Compare two players at their peak seasons.<br/><small style={{ opacity: 0.45 }}>Seasons 2000–2023 have best API coverage</small></p>
+      <p className="feature-description">
+        Compare two players at their peak seasons.<br/>
+        <small style={{ opacity: 0.45 }}>Seasons 2000–2023 have best API coverage</small>
+      </p>
 
       {/* Input */}
       <div className="glass-card" style={{ marginBottom: 28 }}>
@@ -176,11 +177,11 @@ const PrimePredictor = ({ apiKey }) => {
             <div className="glass-card">
               <div className="section-label">Head to Head</div>
               {[
-                { l: 'Points',   v1: fmt(s1.pts),            v2: fmt(s2.pts) },
-                { l: 'Rebounds', v1: fmt(s1.reb),            v2: fmt(s2.reb) },
-                { l: 'Assists',  v1: fmt(s1.ast),            v2: fmt(s2.ast) },
-                { l: 'Steals',   v1: fmt(s1.stl),            v2: fmt(s2.stl) },
-                { l: 'Blocks',   v1: fmt(s1.blk),            v2: fmt(s2.blk) },
+                { l: 'Points',   v1: fmt(s1.pts),                v2: fmt(s2.pts) },
+                { l: 'Rebounds', v1: fmt(s1.reb),                v2: fmt(s2.reb) },
+                { l: 'Assists',  v1: fmt(s1.ast),                v2: fmt(s2.ast) },
+                { l: 'Steals',   v1: fmt(s1.stl),                v2: fmt(s2.stl) },
+                { l: 'Blocks',   v1: fmt(s1.blk),                v2: fmt(s2.blk) },
                 { l: 'FG%',      v1: `${safePct(s1.fg_pct)}%`,  v2: `${safePct(s2.fg_pct)}%` },
                 { l: '3P%',      v1: `${safePct(s1.fg3_pct)}%`, v2: `${safePct(s2.fg3_pct)}%` },
                 { l: 'FT%',      v1: `${safePct(s1.ft_pct)}%`,  v2: `${safePct(s2.ft_pct)}%` },
@@ -208,11 +209,11 @@ const PrimePredictor = ({ apiKey }) => {
             <div className="section-label" style={{ marginBottom: 8 }}>Statistical Breakdown</div>
             <ResponsiveContainer width="100%" height="88%">
               <BarChart layout="vertical" margin={{ left: 10, right: 24 }} data={[
-                { name: 'Points',   [p1.name]: safeNum(s1.pts), [p2.name]: safeNum(s2.pts) },
-                { name: 'Rebounds', [p1.name]: safeNum(s1.reb), [p2.name]: safeNum(s2.reb) },
-                { name: 'Assists',  [p1.name]: safeNum(s1.ast), [p2.name]: safeNum(s2.ast) },
-                { name: 'FG%',      [p1.name]: safePct(s1.fg_pct), [p2.name]: safePct(s2.fg_pct) },
-                { name: '3P%',      [p1.name]: safePct(s1.fg3_pct), [p2.name]: safePct(s2.fg3_pct) },
+                { name: 'Points',   [p1.name]: safeNum(s1.pts),      [p2.name]: safeNum(s2.pts) },
+                { name: 'Rebounds', [p1.name]: safeNum(s1.reb),      [p2.name]: safeNum(s2.reb) },
+                { name: 'Assists',  [p1.name]: safeNum(s1.ast),      [p2.name]: safeNum(s2.ast) },
+                { name: 'FG%',      [p1.name]: safePct(s1.fg_pct),   [p2.name]: safePct(s2.fg_pct) },
+                { name: '3P%',      [p1.name]: safePct(s1.fg3_pct),  [p2.name]: safePct(s2.fg3_pct) },
               ]}>
                 <XAxis type="number" stroke="rgba(255,255,255,0.15)" tick={{ fontSize: 11, fill: 'rgba(244,244,251,0.4)' }} />
                 <YAxis type="category" dataKey="name" stroke="rgba(255,255,255,0.15)" width={76} tick={{ fontSize: 11, fill: 'rgba(244,244,251,0.4)' }} />
